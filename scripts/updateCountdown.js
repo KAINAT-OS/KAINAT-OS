@@ -1,36 +1,35 @@
 // scripts/updateCountdown.js
-const fs = require('fs');
+const fs   = require('fs');
 const path = require('path');
 
-// === CONFIGURE YOUR TARGET DATE HERE ===
-// First release: May 12, 2025 (today)
-// Next 6-month target: November 12, 2025 00:00:00 UTC
-const target = new Date('2025-11-12T00:00:00Z');
+// === CONFIGURE TARGET ===
+// Next 6-month release: November 12, 2025 UTC
+const TARGET = new Date('2025-11-12T00:00:00Z');
 
 function formatDuration(ms) {
   const totalSeconds = Math.floor(ms / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const days    = Math.floor(totalSeconds / 86400);
+  const hours   = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   return `${days} days, ${hours} hours, ${minutes} minutes`;
 }
 
 function updateReadme() {
   const readmePath = path.join(__dirname, '..', 'readme.md');
-  const readme = fs.readFileSync(readmePath, 'utf-8');
+  let content = fs.readFileSync(readmePath, 'utf-8');
+  const now  = new Date();
+  const diff = TARGET - now;
 
-  const now = new Date();
-  const diff = target - now;
-  const countdownText = diff > 0
+  const countdown = diff > 0
     ? `**⏳ Time until next release:** ${formatDuration(diff)}`
     : '**🚀 Release is live!**';
 
-  const updated = readme.replace(
+  content = content.replace(
     /<!-- COUNTDOWN:START -->[\s\S]*?<!-- COUNTDOWN:END -->/,
-    `<!-- COUNTDOWN:START -->\n${countdownText}\n<!-- COUNTDOWN:END -->`
+    `<!-- COUNTDOWN:START -->\n${countdown}\n<!-- COUNTDOWN:END -->`
   );
 
-  fs.writeFileSync(readmePath, updated);
+  fs.writeFileSync(readmePath, content, 'utf-8');
 }
 
 updateReadme();
