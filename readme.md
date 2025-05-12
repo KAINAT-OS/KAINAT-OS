@@ -4,7 +4,9 @@
 
 # Welcome TO Kainat OS
 Kainat OS is an operating system based on Debian. This operating system is for people who like GUI more than CLI, which doesn't mean it doesn't provide cli. Just more GUI and gaming-friendly OS.
-
+<!-- COUNTDOWN:START -->
+*Loading timer…*
+<!-- COUNTDOWN:END -->
 # Features
 ## Custom KDE-based Kainat Light Desktop or KLD:
 ![442147827-98a769ee-e8bd-4120-8be5-0327500e99c7](https://github.com/user-attachments/assets/d1757c93-0975-40b4-9d5b-91cdfe4727a5)
