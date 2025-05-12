@@ -1,0 +1,49 @@
+# .github/workflows/update-countdown.yml
+
+name: Update Release Countdown
+
+on:
+  schedule:
+    - cron: '0 * * * *'       # every hour; adjust to daily if preferred
+  workflow_dispatch:         # allow manual runs
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout using your PAT stored in secrets.secret_ak
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.secret_ak }}          # authenticate checkout with your PAT :contentReference[oaicite:0]{index=0}
+
+      # 2. Set up Node.js (needed for the countdown script)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # 3. (Optional) Install any dependencies your script needs
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Run your countdown-generation script
+      - name: Generate countdown
+        run: node scripts/updateCountdown.js
+
+      # 5. Configure git to use your PAT for pushes
+      - name: Configure Git to use PAT
+        run: |
+          # Replace remote URL to embed the PAT for pushes
+          git remote set-url origin https://x-access-token:${{ secrets.secret_ak }}@github.com/${{ github.repository }}.git
+
+      # 6. Commit & push only if README.md changed
+      - name: Commit & Push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git diff --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore: update release countdown"
+          git push
