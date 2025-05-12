@@ -33,12 +33,12 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.secret_ak }}@github.com/${{ github.repository }}.git
 
-      # 5. Commit & Push changes if README.md was updated
+      # 5. Commit & Push changes if readme.md was updated
       - name: Commit & Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md
+          git add readme.md
           git diff --quiet && echo "No changes to commit" && exit 0
           git commit -m "chore: update release countdown"
           git push
