@@ -16,7 +16,7 @@ function formatDuration(ms) {
 }
 
 function updateReadme() {
-  const readmePath = path.join(__dirname, '..', 'README.md');
+  const readmePath = path.join(__dirname, '..', 'readme.md');
   const readme = fs.readFileSync(readmePath, 'utf-8');
 
   const now = new Date();
