@@ -4,40 +4,49 @@ name: Update Release Countdown
 
 on:
   schedule:
-    - cron: '0 * * * *'       # every hour; adjust to daily ('0 0 * * *') if you prefer
-  workflow_dispatch:         # allows manual runs
+    - cron: '0 * * * *'       # runs hourly
+  workflow_dispatch:         # allows manual trigger
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout using your PAT stored in secrets.secret_ak
+      # 1. Checkout with your PAT
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.secret_ak }}
 
-      # 2. Set up Node.js (needed for the countdown script)
+      # 2. Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
 
-      # 3. Run your countdown-generation script (no extra deps needed)
+      # 3. Install Nodemailer (and any other deps)
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Update the countdown in readme.md
       - name: Generate countdown
         run: node scripts/updateCountdown.js
 
-      # 4. Configure Git to use PAT for pushes
-      - name: Configure Git to use PAT
+      # 5. Send reminder email if 7 days out
+      - name: Send 7-day reminder email
+        run: node scripts/sendReminder.js
+
+      # 6. Configure Git for push via your PAT
+      - name: Configure Git for push
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.secret_ak }}@github.com/${{ github.repository }}.git
 
-      # 5. Commit & Push changes if readme.md was updated
+      # 7. Commit & push if readme.md changed
       - name: Commit & Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add readme.md
+          git diff --quiet && echo "No changes to commit" && exit 0
           git commit -m "chore: update release countdown"
           git push
